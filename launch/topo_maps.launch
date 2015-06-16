@@ -1,0 +1,21 @@
+<launch>
+    <node name="topo_maps_node" pkg="topo_maps" type="topo_maps_node">
+        <param name="num_paths" type="int" value="4"/>
+        <param name="min_dist" type="double" value="1.0"/>
+        <param name="max_dist" type="double" value="10000.0"/>
+        <param name="pruning" type="boolean" value="false"/>
+        <param name="robot_close" type="boolean" value="true"/>
+        <param name="fixed_frame" type="string" value="map"/>
+        <param name="occupancy_topic" type="string"
+            value="topo_occupancy_grid"/>
+        <param name="odom_topic" type="string" value="odom"/>
+
+        <!-- Use if you want to set goals dynamically in RViz -->
+        <param name="goal_topic" type="string" value="move_base_simple/goal"/>
+
+        <!-- Use if you want to have a simple static goal set by
+            the example.launch file
+        <param name="goal_topic" type="string" value="topo_goal"/>
+        -->
+    </node>
+</launch>

@@ -1,0 +1,11 @@
+<launch>
+    <node pkg="rostopic" type="rostopic" name="odom_pub"
+        args="pub -r 2 odom nav_msgs/Odometry
+        '{header: {frame_id: map},
+        pose: {pose: {position: {x: 1.5, y: 41.5}}}}'"/>
+    <node pkg="rostopic" type="rostopic" name="goal_pub"
+        args="pub -r 2 topo_goal geometry_msgs/PoseStamped
+        '{header: {frame_id: map}, pose: {position: {x: 520, y: 38}}}'"/>
+    <include file="$(find topo_maps)/launch/topo_send_image.launch"/>
+    <include file="$(find topo_maps)/launch/topo_maps.launch"/>
+</launch>
