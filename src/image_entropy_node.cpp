@@ -3,24 +3,27 @@
 #include "opencv2/opencv.hpp"
 
 using namespace cv;
+using namespace std;
+
+const int width = 640;
+const int height = 480;
+const int num_events = 255 / 10 + 1;
+int occs [width][height][num_events];
 
 int main(int argc, char *argv[]) {
 
     VideoCapture cap(0);
-    if(!cap.isOpened())
+    if(!cap.isOpened()) {
         return -1;
+    }
 
     Mat edges;
-    namedWindow("edges",1);
-    for(;;)
-    {
-        Mat frame;
+    Mat frame;
+    namedWindow("edges", 1);
+    while (waitKey(1) < 0) {
         cap >> frame;
         cvtColor(frame, edges, CV_BGR2GRAY);
-        GaussianBlur(edges, edges, Size(7,7), 1.5, 1.5);
-        Canny(edges, edges, 0, 30, 3);
         imshow("edges", edges);
-        if(waitKey(30) >= 0) break;
     }
     return 0;
 
