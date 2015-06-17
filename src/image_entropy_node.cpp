@@ -75,13 +75,13 @@ int main(int argc, char *argv[]) {
     Mat frame;
     Mat e_surf;
     cap >> e_surf;
-    resize(e_surf, e_surf, Size(width, height));
     namedWindow("Entropy", 1);
 
     while (waitKey(1) < 0) {
         cap >> frame;
         cvtColor(frame, frame, CV_BGR2GRAY);
         resize(frame, frame, Size(width, height));
+        resize(e_surf, e_surf, Size(width, height));
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Scalar intensity = frame.at<uchar>(j, i);
@@ -97,8 +97,8 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        resize(e_surf, e_surf, Size(2 * width, 2 * height));
         develop_entropy_image(entropy_grid, &e_surf);
+        resize(e_surf, e_surf, Size(2 * width, 2 * height));
         imshow("Entropy", e_surf);
     }
     return 0;
