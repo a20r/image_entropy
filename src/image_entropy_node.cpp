@@ -92,12 +92,12 @@ int main(int argc, char *argv[]) {
                     double oe = (1 - learning_rate) * entropy_grid[i][j];
                     double ne = learning_rate * calculate_entropy(occs, i, j);
                     entropy_grid[i][j] = oe + ne;
-                    ROS_DEBUG_THROTTLE(1, "%f", oe + ne);
                     reset_occs(occs, i, j);
                 }
             }
         }
 
+        resize(e_surf, e_surf, Size(2 * width, 2 * height));
         develop_entropy_image(entropy_grid, &e_surf);
         imshow("Entropy", e_surf);
     }

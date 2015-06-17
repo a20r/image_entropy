@@ -3,7 +3,7 @@ const int width = 320;
 const int height = 240;
 const int interval = 10;
 const int num_events = 255 / interval + 1;
-const int update_threshold = 10;
+const int update_threshold = 5;
 const double learning_rate = 0.4;
 
 void initialize_occs(int occs[width][height][num_events]);
