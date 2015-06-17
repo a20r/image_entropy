@@ -47,7 +47,7 @@ int sum_row(int occs[width][height][num_events], int x, int y) {
 
 void reset_occs(int occs[width][height][num_events], int x, int y) {
     for (int i = 0; i < num_events; i++) {
-        occs[x][y][i] = 1;
+        occs[x][y][i] = 0;
     }
 }
 
