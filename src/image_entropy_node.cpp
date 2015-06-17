@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-        imshow("Entropy", frame);
+        imshow("Entropy", entropy_grid);
     }
     return 0;
 
