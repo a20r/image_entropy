@@ -3,6 +3,7 @@
 #include "ros/console.h"
 #include "opencv2/opencv.hpp"
 #include "image_entropy_node.hpp"
+#include "tf/tf.h"
 #include <cmath>
 
 using namespace cv;
@@ -54,7 +55,7 @@ void reset_occs(int occs[width][height][num_events], int x, int y) {
 void develop_entropy_image(double eg[width][height], Mat *dst) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            int h = 128 - eg[i][j] * 30;
+            int h = 128 - eg[i][j] * 33;
             if (h < 0) {
                 h = 0;
             }
