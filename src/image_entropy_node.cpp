@@ -1,5 +1,6 @@
 
 #include "ros/ros.h"
+#include "ros/console.h"
 #include "opencv2/opencv.hpp"
 
 using namespace cv;
@@ -11,6 +12,10 @@ const int num_events = 255 / 10 + 1;
 int occs [width][height][num_events];
 
 int main(int argc, char *argv[]) {
+
+    ros::init(argc, argv, "image_entropy_node");
+    ros::NodeHandle n;
+    ros::Time::init();
 
     VideoCapture cap(0);
     if(!cap.isOpened()) {
@@ -26,7 +31,8 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int event = frame.at<int>(j, i) / 10;
-                occs[i][j][event]++;
+                ROS_DEBUG_THROTTLE(1, "%d", event);
+                // occs[i][j][event]++;
             }
         }
 
