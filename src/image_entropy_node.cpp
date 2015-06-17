@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
         cvtColor(e_surf, e_surf, CV_BGR2HSV);
         develop_entropy_image(entropy_grid, &e_surf);
         cvtColor(e_surf, e_surf, CV_HSV2BGR);
-        resize(e_surf, e_surf, Size(4 * width, 4 * height));
+        resize(e_surf, e_surf, Size(640, 480));
         imshow("Entropy", e_surf);
     }
     return 0;
