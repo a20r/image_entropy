@@ -1,6 +1,6 @@
 
 #include "ros/ros.h"
-#include <ros/console.h>
+#include "ros/console.h"
 #include "opencv2/opencv.hpp"
 
 using namespace cv;
@@ -19,6 +19,16 @@ void initialize_occs(int occs[width][height][num_events]) {
             }
         }
     }
+}
+
+int sum_row(int occs[width][height][num_events], int x, int y) {
+
+    int sum = 0;
+    for (int i = 0; i < num_events; i++) {
+        sum += occs[x][y][i];
+    }
+
+    return sum;
 }
 
 int main(int argc, char *argv[]) {
