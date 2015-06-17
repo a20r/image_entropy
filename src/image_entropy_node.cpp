@@ -54,7 +54,7 @@ void reset_occs(int occs[width][height][num_events], int x, int y) {
 void develop_entropy_image(double eg[width][height], Mat *dst) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            dst->at<Vec3b>(j, i) = Vec3b(eg[i][j] * 40, 0, 0);
+            dst->at<Vec3b>(j, i) = Vec3b(eg[i][j] * 30, 124, 124);
         }
     }
 }
@@ -98,7 +98,8 @@ int main(int argc, char *argv[]) {
         }
 
         develop_entropy_image(entropy_grid, &e_surf);
-        resize(e_surf, e_surf, Size(2 * width, 2 * height));
+        cvtColor(e_surf, e_surf, CV_BGR2HSV);
+        resize(e_surf, e_surf, Size(4 * width, 4 * height));
         imshow("Entropy", e_surf);
     }
     return 0;
