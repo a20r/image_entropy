@@ -2,14 +2,14 @@
 #include "ros/ros.h"
 #include "ros/console.h"
 #include "opencv2/opencv.hpp"
+#include "image_entropy_node.hpp"
+#include <cmath>
 
 using namespace cv;
 using namespace std;
 
-const int width = 640;
-const int height = 480;
-const int num_events = 255 / 10 + 1;
 int occs [width][height][num_events];
+double entropy_grid[width][height] = {1};
 
 void initialize_occs(int occs[width][height][num_events]) {
     for (int i = 0; i < width; i++) {
@@ -19,6 +19,18 @@ void initialize_occs(int occs[width][height][num_events]) {
             }
         }
     }
+}
+
+double calculate_entropy(int occs[width][height][num_events], int x, int y) {
+    double total = sum_row(occs, x, y);
+    double entropy = 0;
+    double prob;
+    for (int i = 0; i < num_events; i++) {
+        prob = occs[x][y][i] / total;
+        entropy -= prob * log2(prob);
+    }
+
+    return entropy;
 }
 
 int sum_row(int occs[width][height][num_events], int x, int y) {
@@ -46,7 +58,7 @@ int main(int argc, char *argv[]) {
     Mat edges;
     Mat frame;
     namedWindow("Entropy", 1);
-    ROS_DEBUG("%d", num_events);
+
     while (waitKey(1) < 0) {
         cap >> frame;
         cvtColor(frame, frame, CV_BGR2GRAY);
@@ -55,6 +67,7 @@ int main(int argc, char *argv[]) {
                 Scalar intensity = frame.at<uchar>(j, i);
                 int event = intensity.val[0] / 10;
                 occs[i][j][event]++;
+                entropy_grid[i][j] = calculate_entropy(occs, i, j);
             }
         }
         imshow("Entropy", frame);
