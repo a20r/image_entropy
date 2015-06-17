@@ -26,8 +26,10 @@ double calculate_entropy(int occs[width][height][num_events], int x, int y) {
     double entropy = 0;
     double prob;
     for (int i = 0; i < num_events; i++) {
-        prob = occs[x][y][i] / total;
-        entropy -= prob * log2(prob);
+        if (occs[x][y][i] > 0) {
+            prob = occs[x][y][i] / total;
+            entropy -= prob * log2(prob);
+        }
     }
 
     return entropy;
@@ -49,6 +51,14 @@ void reset_occs(int occs[width][height][num_events], int x, int y) {
     }
 }
 
+void develop_entropy_image(double eg[width][height], Mat *dst) {
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++) {
+            dst->at<Vec3b>(j, i) = Vec3b(eg[i][j] * 40, 0, 0);
+        }
+    }
+}
+
 
 int main(int argc, char *argv[]) {
 
@@ -62,8 +72,10 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    Mat edges;
     Mat frame;
+    Mat e_surf;
+    cap >> e_surf;
+    resize(e_surf, e_surf, Size(width, height));
     namedWindow("Entropy", 1);
 
     while (waitKey(1) < 0) {
@@ -73,18 +85,21 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Scalar intensity = frame.at<uchar>(j, i);
-                int event = intensity.val[0] / 10;
+                int event = intensity.val[0] / interval;
                 occs[i][j][event]++;
 
                 if (sum_row(occs, i, j) >= update_threshold) {
                     double oe = (1 - learning_rate) * entropy_grid[i][j];
                     double ne = learning_rate * calculate_entropy(occs, i, j);
                     entropy_grid[i][j] = oe + ne;
+                    ROS_DEBUG_THROTTLE(1, "%f", oe + ne);
                     reset_occs(occs, i, j);
                 }
             }
         }
-        imshow("Entropy", frame);
+
+        develop_entropy_image(entropy_grid, &e_surf);
+        imshow("Entropy", e_surf);
     }
     return 0;
 
