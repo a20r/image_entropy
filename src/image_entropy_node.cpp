@@ -23,9 +23,10 @@ int main(int argc, char *argv[]) {
     while (waitKey(1) < 0) {
         cap >> frame;
         cvtColor(frame, edges, CV_BGR2GRAY);
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int event = frame.at<int>(j, i) / 10;
+                occs[i][j][event]++;
             }
         }
 
