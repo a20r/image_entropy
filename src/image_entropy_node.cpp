@@ -43,6 +43,13 @@ int sum_row(int occs[width][height][num_events], int x, int y) {
     return sum;
 }
 
+void reset_occs(int occs[width][height][num_events], int x, int y) {
+    for (int i = 0; i < num_events; i++) {
+        occs[x][y][i] = 1;
+    }
+}
+
+
 int main(int argc, char *argv[]) {
 
     ros::init(argc, argv, "image_entropy_node");
@@ -62,12 +69,19 @@ int main(int argc, char *argv[]) {
     while (waitKey(1) < 0) {
         cap >> frame;
         cvtColor(frame, frame, CV_BGR2GRAY);
+        resize(frame, frame, Size(width, height));
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Scalar intensity = frame.at<uchar>(j, i);
                 int event = intensity.val[0] / 10;
                 occs[i][j][event]++;
-                entropy_grid[i][j] = calculate_entropy(occs, i, j);
+
+                if (sum_row(occs, i, j) >= update_threshold) {
+                    double oe = (1 - learning_rate) * entropy_grid[i][j];
+                    double ne = learning_rate * calculate_entropy(occs, i, j);
+                    entropy_grid[i][j] = oe + ne;
+                    reset_occs(occs, i, j);
+                }
             }
         }
         imshow("Entropy", frame);
