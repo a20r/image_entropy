@@ -23,6 +23,12 @@ int main(int argc, char *argv[]) {
     while (waitKey(1) < 0) {
         cap >> frame;
         cvtColor(frame, edges, CV_BGR2GRAY);
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+
+            }
+        }
+
         imshow("edges", edges);
     }
     return 0;
