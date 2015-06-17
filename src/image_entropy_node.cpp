@@ -1,6 +1,6 @@
 
 #include "ros/ros.h"
-#include "ros/console.h"
+#include <ros/console.h>
 #include "opencv2/opencv.hpp"
 
 using namespace cv;
@@ -35,19 +35,19 @@ int main(int argc, char *argv[]) {
 
     Mat edges;
     Mat frame;
-    namedWindow("edges", 1);
+    namedWindow("Entropy", 1);
+    ROS_DEBUG("%d", num_events);
     while (waitKey(1) < 0) {
         cap >> frame;
-        cvtColor(frame, edges, CV_BGR2GRAY);
+        cvtColor(frame, frame, CV_BGR2GRAY);
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                int event = frame.at<int>(j, i) / 10;
-                ROS_DEBUG_THROTTLE(10, "%d", event);
-                // occs[i][j][event]++;
+                Scalar intensity = frame.at<uchar>(j, i);
+                int event = intensity.val[0] / 10;
+                occs[i][j][event]++;
             }
         }
-
-        imshow("edges", edges);
+        imshow("Entropy", frame);
     }
     return 0;
 
