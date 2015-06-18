@@ -1,6 +1,0 @@
-<launch>
-    <node pkg="tf" type="static_transform_publisher" name="stupid_broadcaster"
-        args="0 0 0 0 0 0 map my_frame 100" />
-    <node name="rviz" type="rviz" pkg="rviz"
-        args="-d $(find topo_maps)/config.rviz"/>
-</launch>

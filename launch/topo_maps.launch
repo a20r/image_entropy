@@ -1,5 +1,0 @@
-<launch>
-    <node name="image_entropy_node" pkg="image_entropy"
-        type="image_entropy_node">
-    </node>
-</launch>
