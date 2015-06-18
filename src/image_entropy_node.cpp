@@ -55,7 +55,7 @@ void reset_occs(int occs[width][height][num_events], int x, int y) {
 void develop_entropy_image(double eg[width][height], Mat *dst) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
-            int h = 128 - eg[i][j] * 33;
+            int h = 128 - eg[i][j] * 40;
             if (h < 0) {
                 h = 0;
             }
@@ -105,6 +105,7 @@ int main(int argc, char *argv[]) {
         cvtColor(e_surf, e_surf, CV_BGR2HSV);
         develop_entropy_image(entropy_grid, &e_surf);
         cvtColor(e_surf, e_surf, CV_HSV2BGR);
+        GaussianBlur(e_surf, e_surf, Size(5, 5), 0, 0);
         resize(e_surf, e_surf, Size(640, 480));
         imshow("Entropy", e_surf);
     }
