@@ -5,6 +5,7 @@
 #include "opencv2/opencv.hpp"
 #include "image_entropy_node.hpp"
 #include "tf/tf.h"
+#include <omp.h>
 #include <cmath>
 
 using namespace cv;
@@ -58,7 +59,9 @@ void reset_occs(int occs[width][height][num_events], int x, int y) {
 }
 
 void develop_entropy_image(double eg[width][height], Mat *dst) {
-    for (int i = 0; i < width; i++) {
+    int i;
+    #pragma omp parallel for
+    for (i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             int h = 128 - eg[i][j] * 40;
             if (h < 0) {
@@ -74,7 +77,11 @@ void pose_callback(geometry_msgs::Pose) {
     cvtColor(frame, frame, CV_BGR2GRAY);
     resize(frame, frame, Size(width, height));
     resize(e_surf, e_surf, Size(width, height));
-    for (int i = 0; i < width; i++) {
+
+    int i;
+    // double start = omp_get_wtime();
+    #pragma omp parallel for
+    for (i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             Scalar intensity = frame.at<uchar>(j, i);
             int event = intensity.val[0] / interval;
@@ -88,6 +95,8 @@ void pose_callback(geometry_msgs::Pose) {
             }
         }
     }
+    // double end = omp_get_wtime();
+    // ROS_DEBUG_THROTTLE(1, "%f", end - start);
 
     cvtColor(e_surf, e_surf, CV_BGR2HSV);
     develop_entropy_image(entropy_grid, &e_surf);

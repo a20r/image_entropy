@@ -1,6 +1,6 @@
 <launch>
     <node pkg="rostopic" type="rostopic" name="pose_pub"
-        args="pub /pose_pub geometry_msgs/Pose -r 10
+        args="pub /pose_pub geometry_msgs/Pose -r 100
         '{position: {x: 0, y: 0}}'"/>
     <node name="image_entropy_node" pkg="image_entropy"
         type="image_entropy_node">
