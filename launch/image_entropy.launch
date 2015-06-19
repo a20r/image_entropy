@@ -1,5 +1,8 @@
 <launch>
     <node name="image_entropy_node" pkg="image_entropy"
         type="image_entropy_node">
+        <param name="pose_topic" type="string" value="pose_pub"/>
+        <param name="learning_rate" type="double" value="0.05"/>
+        <param name="update_threshold" type="int" value="5"/>
     </node>
 </launch>

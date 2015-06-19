@@ -13,7 +13,9 @@ using namespace cv;
 using namespace std;
 
 int occs [width][height][num_events];
+int update_threshold;
 double entropy_grid[width][height] = {1};
+double learning_rate;
 string pose_topic;
 string image_entropy_topic = "/image_entropy/entropy";
 VideoCapture cap;
@@ -72,7 +74,6 @@ void develop_entropy_image(double eg[width][height], Mat *dst) {
 }
 
 void pose_callback(geometry_msgs::Pose) {
-    double start = clock();
     cap >> frame;
     cvtColor(frame, frame, CV_BGR2GRAY);
     resize(frame, frame, Size(width, height));
@@ -99,8 +100,6 @@ void pose_callback(geometry_msgs::Pose) {
     resize(e_surf, e_surf, Size(640, 480));
     imshow("Entropy", e_surf);
     waitKey(1);
-    double end = clock();
-    ROS_DEBUG_THROTTLE(1, "%f", (end - start) / (double) CLOCKS_PER_SEC);
 }
 
 int main(int argc, char *argv[]) {
@@ -118,6 +117,8 @@ int main(int argc, char *argv[]) {
     }
 
     ros::param::get("~pose_topic", pose_topic);
+    ros::param::get("~learning_rate", learning_rate);
+    ros::param::get("~update_threshold", update_threshold);
     pose_sub = n.subscribe(pose_topic, queue_size, pose_callback);
     ros::spin();
     return 0;
