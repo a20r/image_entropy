@@ -4,5 +4,7 @@
         <param name="pose_topic" type="string" value="pose_pub"/>
         <param name="learning_rate" type="double" value="0.05"/>
         <param name="update_threshold" type="int" value="5"/>
+        <param name="horizontal_angle" type="double" value="29"/>
+        <param name="vertical_angle" type="double" value="29"/>
     </node>
 </launch>

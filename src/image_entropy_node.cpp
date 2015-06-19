@@ -2,28 +2,29 @@
 #include "ros/ros.h"
 #include "ros/console.h"
 #include "geometry_msgs/Pose.h"
+#include "geometry_msgs/Point32.h"
+#include "sensor_msgs/PointCloud.h"
 #include "opencv2/opencv.hpp"
 #include "image_entropy_node.hpp"
 #include "tf/tf.h"
-#include <omp.h>
 #include <cmath>
 #include <ctime>
 
 using namespace cv;
 using namespace std;
 
+int pc_counter = 0;
 int occs [width][height][num_events];
 int update_threshold;
 double entropy_grid[width][height] = {1};
-double learning_rate;
+double learning_rate, h_angle, v_angle;
 string pose_topic;
-string image_entropy_topic = "/image_entropy/entropy";
 VideoCapture cap;
 ros::Subscriber pose_sub;
+ros::Publisher pc_pub;
 Mat frame, e_surf;
 
-
-void initialize_occs(int occs[width][height][num_events]) {
+inline void initialize_occs(int occs[width][height][num_events]) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             reset_occs(occs, i, j);
@@ -31,7 +32,8 @@ void initialize_occs(int occs[width][height][num_events]) {
     }
 }
 
-double calculate_entropy(int occs[width][height][num_events], int x, int y) {
+inline double calculate_entropy(int occs[width][height][num_events],
+        int x, int y) {
     double total = sum_row(occs, x, y);
     double entropy = 0;
     double prob;
@@ -44,7 +46,7 @@ double calculate_entropy(int occs[width][height][num_events], int x, int y) {
     return entropy;
 }
 
-int sum_row(int occs[width][height][num_events], int x, int y) {
+inline int sum_row(int occs[width][height][num_events], int x, int y) {
 
     int sum = 0;
     for (int i = 0; i < num_events; i++) {
@@ -53,29 +55,38 @@ int sum_row(int occs[width][height][num_events], int x, int y) {
     return sum;
 }
 
-void reset_occs(int occs[width][height][num_events], int x, int y) {
+inline void reset_occs(int occs[width][height][num_events], int x, int y) {
     for (int i = 0; i < num_events; i++) {
         occs[x][y][i] = 0;
     }
 }
 
-void develop_entropy_image(double eg[width][height], Mat *dst) {
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            int h = 128 - eg[i][j] * 40;
-            if (h < 0) {
-                h = 0;
-            }
-            dst->at<Vec3b>(j, i) = Vec3b(h, 255, 255);
-        }
-    }
+inline geometry_msgs::Point32 transform_pixel(int px, int py,
+        geometry_msgs::Pose pose) {
+
+    geometry_msgs::Point32 pos;
+    double x = pose.position.z * tan(px * h_angle / width - h_angle / 2);
+    double y = pose.position.z * tan((height - py) * v_angle / height
+            - v_angle / 2);
+    double beta = 2 * acos(pose.orientation.w);
+    pos.x = x * cos(beta) - y * sin(beta) + pose.position.x;
+    pos.y = x * sin(beta) + y * cos(beta) + pose.position.y;
+    pos.z = 0;
+    return pos;
 }
 
-void pose_callback(geometry_msgs::Pose) {
+void pose_callback(geometry_msgs::Pose pose) {
     cap >> frame;
     cvtColor(frame, frame, CV_BGR2GRAY);
     resize(frame, frame, Size(width, height));
-    resize(e_surf, e_surf, Size(width, height));
+    sensor_msgs::PointCloud pc;
+    pc.header.seq = pc_counter++;
+    pc.header.stamp = ros::Time::now();
+    pc.header.frame_id = "map";
+
+    sensor_msgs::ChannelFloat32 cf;
+    cf.name = "intensity";
+    pc.channels.push_back(cf);
 
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
@@ -89,15 +100,16 @@ void pose_callback(geometry_msgs::Pose) {
                 entropy_grid[i][j] = oe + ne;
                 reset_occs(occs, i, j);
             }
+            geometry_msgs::Point32 pos = transform_pixel(i, j, pose);
+            pc.points.push_back(pos);
+            pc.channels[0].values.push_back(entropy_grid[i][j]);
         }
     }
-    cvtColor(e_surf, e_surf, CV_BGR2HSV);
-    develop_entropy_image(entropy_grid, &e_surf);
-    cvtColor(e_surf, e_surf, CV_HSV2BGR);
-    GaussianBlur(e_surf, e_surf, Size(5, 5), 0, 0);
-    resize(e_surf, e_surf, Size(640, 480));
-    imshow("Entropy", e_surf);
-    waitKey(1);
+    pc_pub.publish(pc);
+}
+
+inline double radians(double degree) {
+    return degree * (M_PI / 180);
 }
 
 int main(int argc, char *argv[]) {
@@ -111,12 +123,17 @@ int main(int argc, char *argv[]) {
     }
 
     cap >> e_surf;
-    namedWindow("Entropy", 1);
+    resize(e_surf, e_surf, Size(width, height));
     initialize_occs(occs);
     ros::param::get("~pose_topic", pose_topic);
     ros::param::get("~learning_rate", learning_rate);
     ros::param::get("~update_threshold", update_threshold);
+    ros::param::get("~horizontal_angle", h_angle);
+    ros::param::get("~vertical_angle", v_angle);
+    h_angle = radians(h_angle);
+    v_angle = radians(v_angle);
     pose_sub = n.subscribe(pose_topic, queue_size, pose_callback);
+    pc_pub = n.advertise<sensor_msgs::PointCloud>("entropy_cloud", queue_size);
     ros::spin();
     return 0;
 }

@@ -1,11 +1,13 @@
 <launch>
     <node pkg="rostopic" type="rostopic" name="pose_pub"
         args="pub /pose_pub geometry_msgs/Pose -r 100
-        '{position: {x: 0, y: 0}}'"/>
+        '{position: {x: 0, y: 0, z: 100}}'"/>
     <node name="image_entropy_node" pkg="image_entropy"
         type="image_entropy_node">
         <param name="pose_topic" type="string" value="pose_pub"/>
         <param name="learning_rate" type="double" value="0.05"/>
         <param name="update_threshold" type="int" value="5"/>
+        <param name="horizontal_angle" type="double" value="29"/>
+        <param name="vertical_angle" type="double" value="29"/>
     </node>
 </launch>
