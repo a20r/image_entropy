@@ -1,7 +1,7 @@
 
 #include "ros/ros.h"
 #include "ros/console.h"
-#include "geometry_msgs/Pose.h"
+#include "geometry_msgs/PoseStamped.h"
 #include "geometry_msgs/Point32.h"
 #include "sensor_msgs/PointCloud.h"
 #include "opencv2/opencv.hpp"
@@ -62,20 +62,20 @@ inline void reset_occs(int occs[width][height][num_events], int x, int y) {
 }
 
 inline geometry_msgs::Point32 transform_pixel(int px, int py,
-        geometry_msgs::Pose pose) {
+        geometry_msgs::PoseStamped pose) {
 
     geometry_msgs::Point32 pos;
-    double x = pose.position.z * tan(px * h_angle / width - h_angle / 2);
-    double y = pose.position.z * tan((height - py) * v_angle / height
+    double x = pose.pose.position.z * tan(px * h_angle / width - h_angle / 2);
+    double y = pose.pose.position.z * tan((height - py) * v_angle / height
             - v_angle / 2);
-    double beta = 2 * acos(pose.orientation.w);
-    pos.x = x * cos(beta) - y * sin(beta) + pose.position.x;
-    pos.y = x * sin(beta) + y * cos(beta) + pose.position.y;
+    double beta = 2 * acos(pose.pose.orientation.w);
+    pos.x = x * cos(beta) - y * sin(beta) + pose.pose.position.x;
+    pos.y = x * sin(beta) + y * cos(beta) + pose.pose.position.y;
     pos.z = 0;
     return pos;
 }
 
-void pose_callback(geometry_msgs::Pose pose) {
+void pose_callback(geometry_msgs::PoseStamped pose) {
     cap >> frame;
     cvtColor(frame, frame, CV_BGR2GRAY);
     resize(frame, frame, Size(width, height));
