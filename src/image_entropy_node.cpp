@@ -41,7 +41,6 @@ double calculate_entropy(int occs[width][height][num_events], int x, int y) {
             entropy -= prob * log2(prob);
         }
     }
-
     return entropy;
 }
 
@@ -51,7 +50,6 @@ int sum_row(int occs[width][height][num_events], int x, int y) {
     for (int i = 0; i < num_events; i++) {
         sum += occs[x][y][i];
     }
-
     return sum;
 }
 
@@ -106,16 +104,15 @@ int main(int argc, char *argv[]) {
 
     ros::init(argc, argv, "image_entropy_node");
     ros::NodeHandle n;
-
-    namedWindow("Entropy", 1);
-    initialize_occs(occs);
     cap = VideoCapture(0);
-    cap >> e_surf;
 
     if(!cap.isOpened()) {
         return -1;
     }
 
+    cap >> e_surf;
+    namedWindow("Entropy", 1);
+    initialize_occs(occs);
     ros::param::get("~pose_topic", pose_topic);
     ros::param::get("~learning_rate", learning_rate);
     ros::param::get("~update_threshold", update_threshold);
