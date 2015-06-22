@@ -9,6 +9,7 @@
 #include "tf/tf.h"
 #include <cmath>
 #include <ctime>
+#include <unordered_map>
 
 using namespace cv;
 using namespace std;
@@ -20,12 +21,20 @@ ros::Publisher ec_pub;
 vector<ros::Subscriber> pc_subs;
 sensor_msgs::PointCloud entropy_cloud;
 int pc_counter = 0;
+map<geometry_msgs::Point32, int> point_map;
 
 void pc_callback(sensor_msgs::PointCloud pc) {
-
     for (int i = 0; i < pc.points.size(); i++) {
+        // if (point_map.count(pc.points[i]) > 0) {
+        //     int j = point_map[pc.points[i]];
+        //     entropy_cloud.points[j] = pc.points[i];
+        //     entropy_cloud.channels[0].values[j] = pc.channels[0].values[i];
+        // } else {
         entropy_cloud.points.push_back(pc.points[i]);
-        entropy_cloud.channels[0].values.push_back(pc.channels[0].values[i]);
+        entropy_cloud.channels[0].values.push_back(
+                pc.channels[0].values[i]);
+            // point_map[pc.points[i]] = entropy_cloud.points.size();
+        // }
     }
 
     entropy_cloud.header.seq = pc_counter++;
