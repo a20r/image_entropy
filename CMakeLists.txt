@@ -40,7 +40,12 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(image_entropy_node src/image_entropy_node.cpp)
+add_executable(entropy_fuser_node src/entropy_fuser_node.cpp)
 
 target_link_libraries(image_entropy_node
+   ${catkin_LIBRARIES} ${OpenCV_LIBS}
+)
+
+target_link_libraries(entropy_fuser_node
    ${catkin_LIBRARIES} ${OpenCV_LIBS}
 )

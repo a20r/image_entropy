@@ -18,7 +18,7 @@ int occs [width][height][num_events];
 int update_threshold;
 double entropy_grid[width][height] = {1};
 double learning_rate, h_angle, v_angle;
-string pose_topic;
+string pose_topic, pc_topic;
 VideoCapture cap;
 ros::Subscriber pose_sub;
 ros::Publisher pc_pub;
@@ -126,6 +126,7 @@ int main(int argc, char *argv[]) {
     resize(e_surf, e_surf, Size(width, height));
     initialize_occs(occs);
     ros::param::get("~pose_topic", pose_topic);
+    ros::param::get("~point_cloud_topic", pc_topic);
     ros::param::get("~learning_rate", learning_rate);
     ros::param::get("~update_threshold", update_threshold);
     ros::param::get("~horizontal_angle", h_angle);
@@ -133,7 +134,7 @@ int main(int argc, char *argv[]) {
     h_angle = radians(h_angle);
     v_angle = radians(v_angle);
     pose_sub = n.subscribe(pose_topic, queue_size, pose_callback);
-    pc_pub = n.advertise<sensor_msgs::PointCloud>("entropy_cloud", queue_size);
+    pc_pub = n.advertise<sensor_msgs::PointCloud>(pc_topic, queue_size);
     ros::spin();
     return 0;
 }
