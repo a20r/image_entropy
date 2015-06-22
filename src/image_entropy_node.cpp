@@ -47,7 +47,6 @@ inline double calculate_entropy(int occs[width][height][num_events],
 }
 
 inline int sum_row(int occs[width][height][num_events], int x, int y) {
-
     int sum = 0;
     for (int i = 0; i < num_events; i++) {
         sum += occs[x][y][i];
