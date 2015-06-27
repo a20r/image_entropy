@@ -1,0 +1,8 @@
+<launch>
+    <node name="twist_to_pose" pkg="image_entropy" type="twist_to_pose.py">
+        <param name="pose_topic" type="string" value="/pose_pub"/>
+        <param name="twist_topic" type="string" value="/cmd_vel"/>
+        <param name="frame_id" type="string" value="map"/>
+        <param name="altitude" type="int" value="30"/>
+    </node>
+</launch>
