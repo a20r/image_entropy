@@ -67,7 +67,9 @@ inline geometry_msgs::Point32 transform_pixel(int px, int py,
     double y = pose.pose.position.z * tan(px * h_angle / width - h_angle / 2);
     double x = pose.pose.position.z * tan((height - py) * v_angle / height
             - v_angle / 2);
-    double beta = abs(2 * acos(pose.pose.orientation.w));
+    double q_3 = pose.pose.orientation.z;
+    double q_0 = pose.pose.orientation.w;
+    double beta = atan2(2 * q_0 * q_3, 1 - 2 * (q_3 * q_3));
     pos.x = x * cos(beta) - y * sin(beta) + pose.pose.position.x;
     pos.y = x * sin(beta) + y * cos(beta) + pose.pose.position.y;
     pos.z = 0;

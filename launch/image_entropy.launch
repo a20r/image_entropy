@@ -6,6 +6,6 @@
         <param name="update_threshold" type="int" value="5"/>
         <param name="horizontal_angle" type="double" value="29"/>
         <param name="vertical_angle" type="double" value="22"/>
-        <param name="point_cloud_topic" type="string" value="entropy_cloud"/>
+        <param name="point_cloud_topic" type="string" value="ec_0"/>
     </node>
 </launch>

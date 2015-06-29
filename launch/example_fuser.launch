@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find image_entropy)/launch/image_entropy.launch"/>
+    <include file="$(find image_entropy)/launch/image_entropy_fuser.launch"/>
+    <include file="$(find image_entropy)/launch/twist_to_pose.launch"/>
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
+        name="teleop_twist_keyboard"/>
+</launch>

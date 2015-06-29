@@ -1,0 +1,8 @@
+<launch>
+    <node name="image_entropy_fuser_node" pkg="image_entropy"
+        type="entropy_fuser_node">
+        <param name="learning_rate" type="double" value="0.05"/>
+        <param name="entropy_cloud_topic" type="string" value="entropy_cloud"/>
+        <rosparam command="load" file="$(find image_entropy)/configs/quads.yaml"/>
+    </node>
+</launch>

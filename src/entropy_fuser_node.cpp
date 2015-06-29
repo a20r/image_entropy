@@ -8,6 +8,7 @@
 #include "image_entropy_node.hpp"
 #include "tf/tf.h"
 #include <cmath>
+#include <sstream>
 #include <ctime>
 #include <unordered_map>
 
@@ -15,26 +16,29 @@ using namespace cv;
 using namespace std;
 
 vector<string> pc_topics;
+vector<ros::Subscriber> sub_vec;
 string ec_topic;
 double learning_rate;
 ros::Publisher ec_pub;
-vector<ros::Subscriber> pc_subs;
 sensor_msgs::PointCloud entropy_cloud;
 int pc_counter = 0;
-map<geometry_msgs::Point32, int> point_map;
+map<string, int> point_map;
 
 void pc_callback(sensor_msgs::PointCloud pc) {
     for (int i = 0; i < pc.points.size(); i++) {
-        // if (point_map.count(pc.points[i]) > 0) {
-        //     int j = point_map[pc.points[i]];
-        //     entropy_cloud.points[j] = pc.points[i];
-        //     entropy_cloud.channels[0].values[j] = pc.channels[0].values[i];
-        // } else {
-        entropy_cloud.points.push_back(pc.points[i]);
-        entropy_cloud.channels[0].values.push_back(
-                pc.channels[0].values[i]);
-            // point_map[pc.points[i]] = entropy_cloud.points.size();
-        // }
+        stringstream buffer;
+        buffer << pc.points[i];
+        string p_string = buffer.str();
+        if (point_map.count(p_string) > 0) {
+            int j = point_map[p_string];
+            entropy_cloud.points[j] = pc.points[i];
+            entropy_cloud.channels[0].values[j] = pc.channels[0].values[i];
+        } else {
+            entropy_cloud.points.push_back(pc.points[i]);
+            entropy_cloud.channels[0].values.push_back(
+                    pc.channels[0].values[i]);
+            point_map[p_string] = entropy_cloud.points.size();
+        }
     }
 
     entropy_cloud.header.seq = pc_counter++;
@@ -53,7 +57,9 @@ int main(int argc, char *argv[]) {
 
     ec_pub = n.advertise<sensor_msgs::PointCloud>(ec_topic, queue_size);
     for (int i = 0; i < pc_topics.size(); i++) {
-        n.subscribe(pc_topics[i], queue_size, pc_callback);
+        ros::Subscriber sub = n.subscribe(pc_topics[i],
+                queue_size, pc_callback);
+        sub_vec.push_back(sub);
     }
 
     sensor_msgs::ChannelFloat32 cf;
@@ -62,7 +68,6 @@ int main(int argc, char *argv[]) {
     entropy_cloud.header.stamp = ros::Time::now();
     entropy_cloud.header.frame_id = "map";
     entropy_cloud.channels.push_back(cf);
-
     ros::spin();
     return 0;
 }
