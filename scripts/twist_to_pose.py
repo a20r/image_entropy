@@ -18,10 +18,11 @@ def twist_callback(twist):
     ps.header.seq = counter
     ps.header.stamp = rospy.Time.now()
     ps.header.frame_id = frame_id
-    ps.pose.position.x += twist.linear.x
-    ps.pose.position.y += twist.linear.y
-    ps.pose.position.z = altitude
+    mag = twist.linear.x
     beta += math.radians(4 * twist.angular.z)
+    ps.pose.position.x += mag * math.cos(beta)
+    ps.pose.position.y += mag * math.sin(beta)
+    ps.pose.position.z = altitude
     q = tf.transformations.quaternion_from_euler(0, 0, beta)
     ps.pose.orientation.x = q[0]
     ps.pose.orientation.y = q[1]
