@@ -28,7 +28,6 @@ def twist_callback(twist):
     ps.pose.orientation.y = q[1]
     ps.pose.orientation.z = q[2]
     ps.pose.orientation.w = q[3]
-    pose_pub.publish(ps)
     counter += 1
 
 
@@ -41,6 +40,10 @@ def run():
     altitude = rospy.get_param("~altitude")
     rospy.Subscriber(twist_topic, Twist, twist_callback)
     pose_pub = rospy.Publisher(pose_topic, PoseStamped, queue_size=0)
+    r = rospy.Rate(30)
+    while not rospy.is_shutdown():
+        pose_pub.publish(ps)
+        r.sleep()
     rospy.spin()
 
 if __name__ == '__main__':

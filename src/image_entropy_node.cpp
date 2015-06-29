@@ -64,10 +64,10 @@ inline geometry_msgs::Point32 transform_pixel(int px, int py,
         geometry_msgs::PoseStamped pose) {
 
     geometry_msgs::Point32 pos;
-    double x = pose.pose.position.z * tan(px * h_angle / width - h_angle / 2);
-    double y = pose.pose.position.z * tan((height - py) * v_angle / height
+    double y = pose.pose.position.z * tan(px * h_angle / width - h_angle / 2);
+    double x = pose.pose.position.z * tan((height - py) * v_angle / height
             - v_angle / 2);
-    double beta = -2 * acos(pose.pose.orientation.w);
+    double beta = abs(2 * acos(pose.pose.orientation.w));
     pos.x = x * cos(beta) - y * sin(beta) + pose.pose.position.x;
     pos.y = x * sin(beta) + y * cos(beta) + pose.pose.position.y;
     pos.z = 0;
