@@ -24,11 +24,18 @@ sensor_msgs::PointCloud entropy_cloud;
 int pc_counter = 0;
 map<string, int> point_map;
 
+inline string point_to_string(geometry_msgs::Point32 *p) {
+    int precision = 2;
+    std::stringstream buffer;
+    buffer << std::setprecision(precision) << p->x
+        << " " << std::setprecision(precision) << p->y
+        << " " << std::setprecision(precision) << p->z;
+    return buffer.str();
+}
+
 void pc_callback(sensor_msgs::PointCloud pc) {
     for (int i = 0; i < pc.points.size(); i++) {
-        stringstream buffer;
-        buffer << pc.points[i];
-        string p_string = buffer.str();
+        string p_string = point_to_string(&pc.points[i]);
         if (point_map.count(p_string) > 0) {
             int j = point_map[p_string];
             entropy_cloud.points[j] = pc.points[i];
